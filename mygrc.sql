@@ -24,7 +24,6 @@ CREATE TABLE site_keywords(
 CREATE TABLE rankings(
   id          integer primary key autoincrement,
   keyword_id  integer,
-  date        text,
   rank        integer,
   url         text,
   created_at  text,
@@ -35,7 +34,7 @@ CREATE TABLE results(
   id          integer primary key autoincrement,
   site_id     integer,
   keyword_id  integer,
-  date        text,
+  rank        integer,
   created_at  text,
   updated_at  text
 );

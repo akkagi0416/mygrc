@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title></title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+  <style>
+  .today{
+    height: 200px;
+    overflow-y: scroll;
+  }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <% @sites.each do |site| %>
+        <label><input type="radio" name="site" value="<%= site.id %>"><%= site.title %></label>
+      <% end %>
+    </div>
+  </header>
+  <main>
+    <div class="container">
+      <h1><%= @site.title %></h1>
+      <p><%= @site.url %></p>
+      <section class="today">
+        <table class="table">
+          <tr>
+            <th>keyword</th>
+            <th>rank</th>
+          </tr>
+          <% @results.each do |result| %>
+            <tr>
+              <td><%= Keyword.find(result.keyword_id).word %></td>
+              <td><%= result.rank %></td>
+            </tr>
+          <% end %>
+        </table>
+      </section>
+      <section class="graph">
+        <div id="curve_chart" style="width: 900px; height: 450px;"></div>
+      </section>
+    </div>
+  </main>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script type="text/javascript">
+    google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+      var data = $.ajax({
+        type: 'GET',
+        url: window.location.href + '/result',
+        data: {
+          'site_id': 1,
+        },
+        dataType: 'json',
+      }).done(function(json_data){
+        console.log('ajax done');
+        console.log(json_data);
+        console.log(json_data['column']);
+        
+        var data = new google.visualization.DataTable();
+        for(var i in json_data['column']){
+          if(i == 0){
+            label = 'date';
+          }else{
+            label = 'number';
+          }
+          data.addColumn(label, json_data['column'][i]);
+        }
+        for(var i in json_data['result']){
+          date = Date.parse(json_data['result'][i][0]);  // 
+          json_data['result'][i][0] = new Date(date);
+          data.addRow(json_data['result'][i]);
+        }
+
+        var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+
+        var options = {
+          title: 'Company Performance',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+
+        chart.draw(data, options);
+
+      }).fail(function(e){
+        console.log('ajax error');
+      });
+
+//      var data = google.visualization.arrayToDataTable([
+//        ['Year', 'Sales', 'Expenses'],
+//        ['2004',  1000,      400],
+//        ['2005',  1170,      460],
+//        ['2006',  660,       1120],
+//        ['2007',  1030,      540]
+//      ]);
+//
+//      var options = {
+//        title: 'Company Performance',
+//        curveType: 'function',
+//        legend: { position: 'bottom' }
+//      };
+//
+//      var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+//
+//      chart.draw(data, options);
+    }
+  </script>
+</body>
+</html>

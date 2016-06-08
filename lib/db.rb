@@ -1,4 +1,5 @@
 require 'active_record'
+require 'activerecord-import'
 
 ActiveRecord::Base.establish_connection(
   adapter:  'sqlite3',
@@ -27,7 +28,13 @@ class SiteKeyword < ActiveRecord::Base
   belongs_to  :keyword
 end
 
+class Ranking < ActiveRecord::Base
+  belongs_to  :keyword
+end
+
 class Result < ActiveRecord::Base
   belongs_to  :site
   has_one     :keyword
+
+  scope :created_today, -> { where(created_at: Time.now.all_day) }
 end
