@@ -30,6 +30,8 @@ end
 
 class Ranking < ActiveRecord::Base
   belongs_to  :keyword
+
+  scope :created_today, -> { where(created_at: Time.now.all_day) }
 end
 
 class Result < ActiveRecord::Base

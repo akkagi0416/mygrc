@@ -8,7 +8,7 @@ CREATE TABLE sites(
 
 CREATE TABLE keywords(
   id    integer primary key autoincrement,
-  word  text,
+  word  text unique,
   created_at  text,
   updated_at  text
 );
